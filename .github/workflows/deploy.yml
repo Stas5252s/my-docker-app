@@ -2,23 +2,20 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main ] # Запускать этот скрипт при каждом push в ветку main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
-    # Права для записи в реестр контейнеров GitHub
     permissions:
       contents: read
       packages: write
 
     steps:
-      # 1. Скачиваем код из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Авторизуемся в реестре GitHub (GHCR)
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -26,10 +23,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3. Собираем и отправляем Docker-образ в репозиторий GitHub
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ghcr.io/stas5252s/my-docker-app:latest
+
+      - name: Trigger Render Deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
