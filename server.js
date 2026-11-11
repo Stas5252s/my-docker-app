@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/my_database';
+
+app.use(morgan('dev'));
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('Connected to MongoDB successfully!'))
